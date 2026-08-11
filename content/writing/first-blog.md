@@ -8,7 +8,7 @@ tags: ["meta"]
 <!-- Starter post. Rewrite it into something you actually mean, or delete the
      file — nothing else depends on it. -->
 
-I've noticed increasing frequency of my ideas and thoughts getting lost in scratch notes and amidst the habitual chaos of life.
-So, this is my attempt to mitigate against that. 
+I've noticed lately how often my ideas and thoughts get lost in scratch notes and amidst the habitual chaos of life.
+So, this is my attempt to mitigate that. 
 
 Expect semi-irregular posts (especially during term-time) and stay tuned!
