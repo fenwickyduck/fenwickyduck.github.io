@@ -1,0 +1,31 @@
+{{- /*
+  A chronological list of posts.
+
+    pages    the pages to render
+    grouped  true to break them into year groups (the writing index),
+             false for a flat run (the home page, which is already headed
+             "Writing" and would otherwise stack two grey labels)
+
+  {{ partial "post-list.html" (dict "pages" $pages "grouped" true) }}
+*/ -}}
+{{- $pages := .pages }}
+{{- if $pages }}
+<div class="archive">
+  {{- if .grouped }}
+    {{- range $pages.GroupByDate "2006" }}
+    <section class="archive__group">
+      <h3 class="archive__year">{{ .Key }}</h3>
+      <ul class="archive__list">
+        {{- range .Pages }}{{ partial "entry.html" . }}{{ end }}
+      </ul>
+    </section>
+    {{- end }}
+  {{- else }}
+  <ul class="archive__list">
+    {{- range $pages }}{{ partial "entry.html" . }}{{ end }}
+  </ul>
+  {{- end }}
+</div>
+{{- else }}
+<p class="empty">Nothing here yet.</p>
+{{- end }}

@@ -1,0 +1,25 @@
+{{- /*
+  Filter strip for the writing section. Every tag used anywhere, with a count,
+  linking to its own page. These are ordinary links to real URLs, so filtering
+  survives without JavaScript and each filtered view can be bookmarked.
+
+  Pass the current term page so it can mark itself active:
+    {{ partial "tag-bar.html" . }}
+*/ -}}
+{{- $tags := site.Taxonomies.tags }}
+{{- if $tags }}
+{{- $isTerm := eq .Kind "term" }}
+<nav class="tag-bar" aria-label="Filter writing by tag">
+  <a class="tag-bar__item{{ if not $isTerm }} is-active{{ end }}"
+     href="{{ "/writing/" | relURL }}"{{ if not $isTerm }} aria-current="page"{{ end }}>
+    All <span class="tag-bar__count">{{ len (where site.RegularPages "Section" "writing") }}</span>
+  </a>
+  {{- range $name, $taxonomy := $tags }}
+  {{- $active := and $isTerm (eq ($.Title | urlize) ($name | urlize)) }}
+  <a class="tag-bar__item{{ if $active }} is-active{{ end }}"
+     href="{{ (printf "/tags/%s/" ($name | urlize)) | relURL }}"{{ if $active }} aria-current="page"{{ end }}>
+    #{{ $name }} <span class="tag-bar__count">{{ len $taxonomy.Pages }}</span>
+  </a>
+  {{- end }}
+</nav>
+{{- end }}

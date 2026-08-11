@@ -1,0 +1,100 @@
+baseURL = "https://fenwickyduck.github.io/"
+locale = "en-GB"
+title = "Seyoon Park"
+
+# Dates without a time (e.g. `date: 2026-08-12`) are interpreted in this zone.
+# Without it, Hugo assumes UTC and a post dated "today" can look like it's in
+# the future and silently not publish. Change this if you move.
+timeZone = "Asia/Seoul"
+copyright = "Seyoon Park"
+
+enableRobotsTXT = true
+enableEmoji = true
+
+# Tag pages are titled with the tag exactly as written, so "#meta" doesn't come
+# back as "#Meta". Pages with an explicit `title` are unaffected.
+capitalizeListTitles = false
+
+# Nothing is published until you say so.
+buildDrafts = false
+buildFuture = false
+
+# Trailing-slash-free, readable URLs: /writing/some-post/
+# :contentbasename, not :slug. `:slug` falls back to the title, so editing a
+# post's title silently changes its URL and breaks every link to it. The file
+# name is the stable identity; set `slug:` in front matter to override.
+[permalinks]
+  writing = "/writing/:contentbasename/"
+
+[params]
+  author = "Seyoon Park"
+  description = "Seyoon Park — computer science at Oxford, writing about cryptography, quantum computation and contest problems."
+  # The home page headline lives in content/_index.md, not here.
+
+  # Written out longhand so address harvesters can't lift it. There is no
+  # mailto: link anywhere on the site, which is the point.
+  emailUser = "fenwickyduck"
+  emailDomain = "gmail"
+  emailTLD = "com"
+  github = "https://github.com/fenwickyduck"
+  linkedin = "https://www.linkedin.com/in/seyoon-park-andrew/"
+  # Set to false to hide the light/dark toggle.
+  showThemeToggle = true
+
+# pageRef, not url: it resolves to a real page, which is what lets Hugo mark
+# the current item. With `url` the active state silently never matches.
+[menu]
+  [[menu.main]]
+    name = "Home"
+    pageRef = "/"
+    weight = 5
+  [[menu.main]]
+    name = "Writing"
+    pageRef = "/writing"
+    weight = 10
+  [[menu.main]]
+    name = "Projects"
+    pageRef = "/projects"
+    weight = 20
+  [[menu.main]]
+    name = "About"
+    pageRef = "/about"
+    weight = 30
+
+[markup]
+  [markup.goldmark.renderer]
+    # Allow raw HTML in posts when you need it.
+    unsafe = true
+  [markup.goldmark.extensions]
+    [markup.goldmark.extensions.typographer]
+      disable = false
+    # LaTeX maths. $x$ inline, $$x$$ display. Rendered to MathML at build time
+    # by layouts/_markup/render-passthrough.html, so no KaTeX ships to readers.
+    [markup.goldmark.extensions.passthrough]
+      enable = true
+      [markup.goldmark.extensions.passthrough.delimiters]
+        block = [['\[', '\]'], ['$$', '$$']]
+        inline = [['\(', '\)'], ['$', '$']]
+  [markup.highlight]
+    noClasses = false          # use CSS classes so highlighting follows the theme
+    lineNos = false
+    tabWidth = 2
+    guessSyntax = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 3
+
+[taxonomies]
+  tag = "tags"
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]
+
+[services]
+  [services.rss]
+    limit = 30
+
+[minify]
+  disableXML = true
+  minifyOutput = true

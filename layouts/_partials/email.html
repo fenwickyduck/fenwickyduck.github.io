@@ -1,0 +1,6 @@
+{{- /*
+  Renders the address as "user [at] domain [dot] tld". No mailto:, no @ sign,
+  nothing a harvester can lift with a regex. Readers retype it, which is the
+  usual academic trade-off.
+*/ -}}
+<span class="email">{{ site.Params.emailUser }} [at] {{ site.Params.emailDomain }} [dot] {{ site.Params.emailTLD }}</span>

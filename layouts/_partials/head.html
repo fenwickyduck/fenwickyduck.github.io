@@ -1,0 +1,50 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+{{- $title := cond .IsHome site.Title (printf "%s — %s" .Title site.Title) }}
+<title>{{ $title }}</title>
+
+{{- $desc := "" }}
+{{- with .Description }}{{ $desc = . }}
+{{- else }}{{ if .IsPage }}{{ $desc = .Summary | plainify | truncate 160 }}{{ else }}{{ $desc = site.Params.description }}{{ end }}
+{{- end }}
+<meta name="description" content="{{ $desc | plainify | chomp }}">
+<meta name="author" content="{{ site.Params.author }}">
+<link rel="canonical" href="{{ .Permalink }}">
+
+<meta property="og:site_name" content="{{ site.Title }}">
+<meta property="og:title" content="{{ cond .IsHome site.Title .Title }}">
+<meta property="og:description" content="{{ $desc | plainify | chomp }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:type" content="{{ cond (eq .Section "writing") "article" "website" }}">
+{{- if and (eq .Section "writing") .IsPage }}
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}
+<meta name="twitter:card" content="summary">
+
+{{- with .OutputFormats.Get "rss" }}
+<link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ site.Title }}">
+{{- end }}
+
+{{- /* Inline SVG, so the favicon costs no request. The duck is drawn by the
+       reader's own emoji font. */}}
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='25' font-size='26' text-anchor='middle'>🦆</text></svg>">
+
+{{- /* Newsreader carries nearly every word on the page, so it's the one face
+       worth fetching early. Mono and italic can arrive late. */}}
+<link rel="preload" href="{{ "/fonts/newsreader-var.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+
+{{- $css := resources.Get "css/main.css" | resources.Minify | resources.Fingerprint "sha256" }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+
+{{- /* Applied before first paint so the correct theme never flashes. */}}
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('theme-source', saved ? 'user' : 'system');
+      document.documentElement.setAttribute('data-theme', saved || (prefersDark ? 'dark' : 'light'));
+    } catch (e) {}
+  })();
+</script>

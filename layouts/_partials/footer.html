@@ -1,0 +1,18 @@
+<footer class="site-footer">
+  <div class="site-footer__inner shell">
+    <p class="site-footer__copy">&copy; {{ now.Year }} {{ or site.Copyright site.Title }}</p>
+    <nav class="site-footer__links" aria-label="Elsewhere">
+      {{- with site.Params.github }}<a href="{{ . }}" rel="me noopener">GitHub</a>{{ end }}
+      {{- with site.Params.linkedin }}<a href="{{ . }}" rel="me noopener">LinkedIn</a>{{ end }}
+      {{- with site.Home.OutputFormats.Get "rss" }}<a href="{{ .RelPermalink }}">RSS</a>{{ end }}
+    </nav>
+    {{- if site.Params.emailUser }}
+    <p class="site-footer__email">{{ partial "email.html" . }}</p>
+    {{- end }}
+  </div>
+</footer>
+
+{{- if site.Params.showThemeToggle }}
+{{- $js := resources.Get "js/theme.js" | resources.Minify | resources.Fingerprint "sha256" }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- end }}

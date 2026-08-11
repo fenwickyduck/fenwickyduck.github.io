@@ -1,0 +1,28 @@
+{{ define "main" }}
+<section class="hero">
+  {{- /* Split on the last space so the surname can drop to its own line. */}}
+  {{- $parts := split site.Title " " }}
+  <h1 class="hero__name">
+    {{- delimit (first (sub (len $parts) 1) $parts) " " }}<span>{{ index $parts (sub (len $parts) 1) }}</span>
+  </h1>
+  {{- /* Set in content/_index.md, so the whole home page lives in one file. */}}
+  {{- with .Params.tagline }}
+  <p class="hero__tagline">{{ . }}</p>
+  {{- end }}
+  {{- with .Content }}
+  <div class="hero__intro prose">{{ . }}</div>
+  {{- end }}
+</section>
+
+{{- $posts := where site.RegularPages "Section" "writing" }}
+{{- $recent := first 6 $posts }}
+<section class="section">
+  <div class="section__head">
+    <h2 class="section__title">Writing</h2>
+    {{- if gt (len $posts) (len $recent) }}
+    <a class="section__aside" href="{{ "/writing/" | relURL }}">All {{ len $posts }}</a>
+    {{- end }}
+  </div>
+  {{ partial "post-list.html" (dict "pages" $recent "grouped" false) }}
+</section>
+{{ end }}

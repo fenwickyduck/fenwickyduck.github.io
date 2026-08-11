@@ -1,0 +1,19 @@
+{{ define "main" }}
+{{- $isTerm := eq .Kind "term" }}
+<header class="page-head">
+  <h1 class="page-head__title">{{ if $isTerm }}#{{ end }}{{ .Title }}</h1>
+  {{- with .Content }}
+  <div class="page-head__intro">{{ . }}</div>
+  {{- end }}
+</header>
+
+{{- /* Shown on the writing index and on every tag page, so you can move
+       between filters without going back first. */}}
+{{ partial "tag-bar.html" . }}
+
+{{ partial "post-list.html" (dict "pages" .Pages "grouped" true) }}
+
+{{- with .OutputFormats.Get "rss" }}
+<p class="list-foot"><a class="section__aside" href="{{ .RelPermalink }}">Subscribe via RSS</a></p>
+{{- end }}
+{{ end }}

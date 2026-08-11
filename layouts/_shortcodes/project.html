@@ -1,0 +1,18 @@
+{{- /* Usage:
+     {{< project name="thing" url="https://…" meta="Python · CLI" >}}
+     One or more paragraphs about it.
+     {{< /project >}}
+*/ -}}
+<li>
+  <h3 class="project__name">
+    {{- with .Get "url" -}}
+      <a href="{{ . }}" rel="noopener">{{ $.Get "name" }}</a>
+    {{- else -}}
+      {{ .Get "name" }}
+    {{- end -}}
+  </h3>
+  <div class="project__body">
+    {{ .Inner | .Page.RenderString (dict "display" "block") }}
+  </div>
+  {{- with .Get "meta" }}<p class="project__meta">{{ . }}</p>{{ end }}
+</li>

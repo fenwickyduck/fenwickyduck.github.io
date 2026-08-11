@@ -1,0 +1,10 @@
+{{- /*
+  Turns LaTeX into MathML at build time. Hugo has KaTeX compiled in, so nothing
+  is sent to the browser: no script, no stylesheet, no maths fonts. Browsers
+  render MathML natively.
+*/ -}}
+{{- if eq .Type "block" -}}
+  {{- transform.ToMath .Inner (dict "displayMode" true) -}}
+{{- else -}}
+  {{- transform.ToMath .Inner -}}
+{{- end -}}

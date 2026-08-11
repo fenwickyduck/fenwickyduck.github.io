@@ -1,0 +1,18 @@
+{{- /* One row in a post list. Called with a page. */ -}}
+<li>
+  <a class="entry" href="{{ .RelPermalink }}">
+    <time class="entry__date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan 2006" }}</time>
+    <h4 class="entry__title">{{ .Title }}</h4>
+    {{- with .Params.subtitle }}
+    <p class="entry__summary">{{ . }}</p>
+    {{- end }}
+    <p class="entry__meta">
+      {{- .ReadingTime }} min
+      {{- with .Params.tags }} &nbsp;·&nbsp;
+        {{- $hashed := slice }}
+        {{- range . }}{{ $hashed = $hashed | append (printf "#%s" .) }}{{ end }}
+        {{- delimit $hashed " " }}
+      {{- end -}}
+    </p>
+  </a>
+</li>

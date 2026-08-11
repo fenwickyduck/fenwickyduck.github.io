@@ -1,0 +1,5 @@
+{{- /* Images become figures; markdown title text becomes the caption. */ -}}
+<figure class="figure">
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text | plainify }}" loading="lazy" decoding="async">
+  {{- with .Title }}<figcaption>{{ . }}</figcaption>{{ end }}
+</figure>

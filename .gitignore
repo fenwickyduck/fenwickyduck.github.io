@@ -1,0 +1,16 @@
+# Hugo build output and caches
+/public/
+/resources/_gen/
+/.hugo_build.lock
+hugo_stats.json
+
+# Local agent config and skills, kept out of the published repo
+.claude/
+CLAUDE.md
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
