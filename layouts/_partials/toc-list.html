@@ -1,0 +1,20 @@
+{{- /*
+  One level of the contents, and then itself for whatever hangs under it.
+
+    headings  a slice of heading fragments
+    depth     the deepest heading level to show
+
+  Anything deeper is dropped rather than flattened, and a level whose every
+  entry is too deep emits nothing at all, so there are no empty lists.
+*/ -}}
+{{- $depth := .depth }}
+{{- with where .headings "Level" "<=" $depth }}
+<ul class="toc__list">
+  {{- range . }}
+  <li>
+    <a href="#{{ .ID }}"><span class="mark" aria-hidden="true"></span>{{ .Title | safeHTML }}</a>
+    {{- with .Headings }}{{ partial "toc-list.html" (dict "headings" . "depth" $depth) }}{{ end }}
+  </li>
+  {{- end }}
+</ul>
+{{- end }}

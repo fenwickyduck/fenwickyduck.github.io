@@ -22,6 +22,11 @@
 {{- end }}
 <meta name="twitter:card" content="summary">
 
+{{- /* The paper colour, so the browser's own chrome on a phone matches the page
+       instead of framing it in white. Same two values as --paper in the CSS. */}}
+<meta name="theme-color" content="#f1f2ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171916" media="(prefers-color-scheme: dark)">
+
 {{- with .OutputFormats.Get "rss" }}
 <link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ site.Title }}">
 {{- end }}
@@ -37,14 +42,16 @@
 {{- $css := resources.Get "css/main.css" | resources.Minify | resources.Fingerprint "sha256" }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
 
-{{- /* Applied before first paint so the correct theme never flashes. */}}
+{{- /* Runs before first paint, so a stored choice never flashes the other theme.
+       A reader who has never touched the toggle gets no attribute at all and
+       stays on `color-scheme: light dark`, which follows the OS on its own. */}}
 <script>
   (function () {
+    var root = document.documentElement;
+    root.classList.remove('no-js');
     try {
       var saved = localStorage.getItem('theme');
-      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.setAttribute('theme-source', saved ? 'user' : 'system');
-      document.documentElement.setAttribute('data-theme', saved || (prefersDark ? 'dark' : 'light'));
+      if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
     } catch (e) {}
   })();
 </script>

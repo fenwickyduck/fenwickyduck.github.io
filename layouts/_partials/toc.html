@@ -1,0 +1,35 @@
+{{- /*
+  Contents, built from the page's own heading tree rather than from Hugo's
+  prebuilt `.TableOfContents` string. Two reasons: the condition below can count
+  headings instead of measuring the length of some generated HTML, and each item
+  is ours to mark up, which is what lets the wide layout hang the list in the
+  margin and put a point beside the line you are pointing at.
+
+  How deep it goes is `tocDepth` in hugo.toml. `.Fragments` pays no attention to
+  [markup.tableOfContents], so that setting would be a decoy if it were left in.
+*/ -}}
+{{- $depth := int (default 3 site.Params.tocDepth) -}}
+
+{{- /* A page whose body has no h1 (which is all of them here, since the title
+       comes from front matter) gets a titleless root fragment holding the rest
+       of the tree. Step past it and start at the real headings. */ -}}
+{{- $tree := .Fragments.Headings -}}
+{{- if and $tree (eq (len $tree) 1) (not (index $tree 0).ID) -}}
+  {{- $tree = (index $tree 0).Headings -}}
+{{- end -}}
+
+{{- /* Two entries is a list of the obvious, so three is the floor. */ -}}
+{{- if and .Params.toc (ge (len .Fragments.Identifiers) 3) -}}
+<details class="toc" open>
+  <summary class="label toc__label">Contents</summary>
+  <nav aria-label="Table of contents">
+    {{- partial "toc-list.html" (dict "headings" $tree "depth" $depth) }}
+  </nav>
+</details>
+{{- /* The script ships from here rather than from the footer so that the one
+       condition above decides both the list and its behaviour, and a page
+       without contents doesn't fetch a file about them. It marks the section
+       being read; without it the list is still a list. */}}
+{{- $toc := resources.Get "js/toc.js" | resources.Minify | resources.Fingerprint "sha256" }}
+<script src="{{ $toc.RelPermalink }}" integrity="{{ $toc.Data.Integrity }}" defer></script>
+{{- end -}}

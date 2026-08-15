@@ -1,9 +1,13 @@
 /* =========================================================================
    Seyoon Park — site theme
 
-   Blueprint-grey ground, blue-cast ink, ultramarine accent. Newsreader sets
-   both the display and the reading text; IBM Plex Mono carries every label,
-   date and tag. Two families, and the contrast between them does the work.
+   Oat-sage paper, warm charcoal ink, one muted plum accent. Newsreader sets
+   the display and the reading text; its italic carries the taglines. IBM Plex
+   Mono handles dates and data, set in sentence case rather than shouted.
+
+   The signature is the lattice: a hexagonal field of points, fading out a few
+   hundred pixels down every page. In two dimensions that lattice is the
+   densest packing there is, which is the sort of fact this site is about.
    ========================================================================= */
 
 /* --- Faces --------------------------------------------------------------- */
@@ -21,6 +25,25 @@
   src: url("/fonts/newsreader-italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
+  font-display: swap;
+}
+
+/* Six glyphs of Noto Serif KR: the hangul and hanja in the masthead, and
+   nothing else. About 2 KB a weight. Regenerate with ./scripts/name-font.sh
+   after changing the characters in hugo.toml. */
+@font-face {
+  font-family: "Noto Serif KR";
+  src: url("/fonts/noto-serif-kr-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Serif KR";
+  src: url("/fonts/noto-serif-kr-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -42,76 +65,95 @@
 
 /* --- Tokens -------------------------------------------------------------- */
 
+/* Every colour is declared once, as light-dark(light, dark), and the browser
+   picks the side that matches the used `color-scheme`. Two consequences worth
+   knowing: the palette can't drift between the two themes, because there is
+   only one of it, and with JavaScript off the page still follows the reader's
+   OS setting, because nothing has to run for `color-scheme: light dark` to
+   mean what it says. The toggle works by overriding that one property. */
 :root {
-  --ground:    #edeff1;
-  --sunk:      #e3e7ea;
-  --ink:       #0f1519;
-  --ink-2:     #4b565d;
-  --ink-3:     #6e787f;
-  --rule:      #d5dbde;
-  --rule-2:    #b7c0c6;
-  --accent:    #2a2fb4;
-  --accent-w:  #e4e5f6;
+  color-scheme: light dark;
 
-  --display: "Newsreader", "Iowan Old Style", Charter, Georgia, serif;
-  --body:    "Newsreader", "Iowan Old Style", Charter, Georgia, serif;
+  --paper:    light-dark(#f1f2ec, #171916);
+  --sunk:     light-dark(#e7e9e0, #1e211c);
+  --card:     light-dark(#f7f8f3, #1b1e19);
+
+  /* The text ramp: three steps, each one legible on its own. Every step clears
+     4.5:1 against paper and against sunk, so nothing that carries words is
+     below the contrast floor. Decoration that carries none uses --rule-*. */
+  --ink:      light-dark(#2b2e26, #e5e6dd);   /* 12.3 : 14.1 */
+  --muted:    light-dark(#505249, #a1a598);   /*  7.1 :  7.0 */
+  --faint:    light-dark(#676a5f, #84897b);   /*  4.9 :  4.9 */
+
+  --rule:     light-dark(#d9dccd, #2a2d26);
+  --rule-2:   light-dark(#c1c6b3, #3b3f36);
+  --accent:   light-dark(#7a4959, #cc94a4);
+  --accent-w: light-dark(#ece0e3, #2c2126);
+  --dot:      light-dark(#d2d6c6, #2f332b);
+
+  /* Chroma's classes are many and its palette is small, so the colours live
+     here as five roles and the highlighting rules below just spend them. */
+  --syn-key:  light-dark(#7a4959, #cc94a4);
+  --syn-str:  light-dark(#3f6a52, #92c2a4);
+  --syn-num:  light-dark(#8a5a2b, #d7a86a);
+  --syn-dim:  light-dark(#676a5f, #84897b);
+  --syn-name: light-dark(#2b2e26, #e5e6dd);
+  --syn-err:  light-dark(#a03a3a, #e08585);
+
+  /* Newsreader first, so it keeps every latin glyph; the Noto subset only ever
+     answers for the characters it actually contains. */
+  --display: "Newsreader", "Noto Serif KR", "Iowan Old Style", Charter, Georgia, serif;
+  --body:    "Newsreader", "Noto Serif KR", "Iowan Old Style", Charter, Georgia, serif;
   --mono:    "Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Rules look wrong when they run past the text they belong to, so there is
-     one content width. --measure exists only for the few blocks that should
-     stay narrower than it, like the hero tagline. */
-  --shell: 42rem;
+  /* How much room the sticky header takes, so an anchored heading lands below
+     it rather than under it. This is a measurement of something the header rules
+     decide, so it is re-stated wherever those rules change shape: the two other
+     declarations are in the header's own media queries, next to the cause. */
+  --header-h: 4.7rem;
+
+  /* One reading column. --margin is the strip to its left where dates and
+     years hang once the window is wide enough to afford one. */
+  --shell: 44rem;
   --measure: 100%;
   --gutter: 1.5rem;
+  --margin: 9rem;
 
-  /* Mono labels are set small, wide and uppercase throughout. */
-  --label-size: 0.7rem;
-  --label-track: 0.16em;
+  --label-size: 0.78rem;
+  --label-track: 0.02em;
 
-  --t-sm:   0.8125rem;
-  --t-base: 1.125rem;
+  --t-sm:   0.85rem;
+  --t-base: 1.0625rem;
   --t-md:   1.25rem;
   --t-lg:   1.5rem;
-  --t-xl:   2rem;
+  --t-xl:   1.95rem;
 
-  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --radius: 10px;
+  --ease: cubic-bezier(0.22, 0.68, 0.24, 1);
 }
 
 @media (min-width: 45em) {
   :root {
-    --t-base: 1.1875rem;
+    --t-base: 1.125rem;
     --t-md: 1.375rem;
     --t-lg: 1.75rem;
-    --t-xl: 2.5rem;
+    --t-xl: 2.3rem;
     --gutter: 2.5rem;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ground:   #0e1317;
-    --sunk:     #161c21;
-    --ink:      #e3e8eb;
-    --ink-2:    #9ca7ae;
-    --ink-3:    #78838a;
-    --rule:     #222a30;
-    --rule-2:   #354047;
-    --accent:   #9095f2;
-    --accent-w: #1b1e33;
-  }
+/* Once the window is wider than the reading column plus two comfortable
+   margins, the margin takes the extra room. Everything that hangs in the strip
+   (dates on the index, contents on a post) widens with it, so there is one
+   margin on this site rather than one per feature. */
+@media (min-width: 86em) {
+  :root { --margin: 12rem; }
 }
 
-:root[data-theme="dark"] {
-  --ground:   #0e1317;
-  --sunk:     #161c21;
-  --ink:      #e3e8eb;
-  --ink-2:    #9ca7ae;
-  --ink-3:    #78838a;
-  --rule:     #222a30;
-  --rule-2:   #354047;
-  --accent:   #9095f2;
-  --accent-w: #1b1e33;
-}
+/* The toggle, and the only thing it does. Setting one property re-picks every
+   colour above, so there is no second palette to keep in step. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
 
 /* --- Base ---------------------------------------------------------------- */
 
@@ -122,26 +164,23 @@ html {
   scroll-behavior: smooth;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
 body {
+  position: relative;
   margin: 0;
-  background: var(--ground);
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--body);
   font-size: var(--t-base);
-  line-height: 1.58;
+  line-height: 1.72;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  /* svh, not vh: on a phone, 100vh is the height with the browser's own bars
+     hidden, so a short page pushes its footer below the fold and the whole
+     thing shifts as the address bar retracts. svh is the height you can
+     actually see at the moment of first paint. */
+  min-height: 100svh;
 }
 
 ::selection { background: var(--accent-w); }
@@ -153,6 +192,7 @@ a { color: inherit; }
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .skip-link {
@@ -161,21 +201,21 @@ a { color: inherit; }
   top: 0;
   z-index: 10;
   background: var(--ink);
-  color: var(--ground);
+  color: var(--paper);
   padding: 0.6rem 1rem;
+  border-radius: 0 0 var(--radius) 0;
   font-family: var(--mono);
   font-size: var(--t-sm);
 }
 .skip-link:focus { left: 0; }
 
-/* Reusable mono label. Used for eyebrows, dates, tags, nav. */
+/* Mono, small, and in sentence case. Dates, counts, captions. */
 .label {
   font-family: var(--mono);
   font-size: var(--label-size);
-  font-weight: 500;
   letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .shell {
@@ -187,174 +227,349 @@ a { color: inherit; }
 
 .page {
   flex: 1 0 auto;
-  padding-block: clamp(2.5rem, 6vw, 4.5rem) 5rem;
+  padding-block: clamp(2rem, 5vw, 3.5rem) 6rem;
+}
+
+/* --- The lattice --------------------------------------------------------- */
+
+/* Two offset point grids with basis (28, 0) and (14, 24.25): the hexagonal
+   lattice. The mask is an ellipse rather than a band, so the field thins out
+   in every direction from a point near the top of the column and is gone
+   before it reaches any long stretch of reading text. */
+.lattice {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 460px;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 50% 50%, var(--dot) 0.85px, transparent 1.05px),
+    radial-gradient(circle at 50% 50%, var(--dot) 0.85px, transparent 1.05px);
+  background-size: 28px 48.5px;
+  background-position: 0 0, 14px 24.25px;
+  -webkit-mask-image: radial-gradient(52rem 20rem at 32% 130px,
+    rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 42%, transparent 76%);
+  mask-image: radial-gradient(52rem 20rem at 32% 130px,
+    rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 42%, transparent 76%);
+  opacity: 0;
+  /* Behind the name and slower than it, so the field is still arriving as the
+     words settle. It carries no text, so nothing waits on it. */
+  animation: lattice-in 900ms var(--ease) 60ms forwards;
+}
+
+@keyframes lattice-in { to { opacity: 1; } }
+
+/* Everything the reader clicks or reads sits above the point field, and the
+   sticky header sits above the page scrolling under it. */
+.page, .site-footer { position: relative; z-index: 1; }
+.site-header { z-index: 5; }
+
+/* The one mark on the site: a lattice point picked out in plum. It marks the
+   current page in the nav and the entry under the cursor in a list. */
+.mark {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
 }
 
 /* --- Header -------------------------------------------------------------- */
 
+/* Opaque and ruled, so it reads as a fixed edge rather than something
+   floating over the page, and stays put on a long post. */
 .site-header {
+  position: sticky;
+  top: 0;
+  background: var(--paper);
   border-bottom: 1px solid var(--rule);
 }
 
+/* Explicit tracks rather than auto margins: the name, the nav and the toggle
+   each own a column and none of them can push the others around. */
 .site-header__inner {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 1rem;
-  padding-block: 1rem;
+  gap: 0.35rem 1.5rem;
+  padding-block: 1.05rem;
 }
 
-.site-header__brand { justify-self: start; min-width: 0; }
-.site-header__end { justify-self: end; display: flex; }
-
 .site-header__name {
-  font-family: var(--mono);
-  font-size: var(--t-sm);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+  grid-column: 1;
+  font-family: var(--display);
+  font-size: var(--t-md);
+  font-weight: 500;
+  letter-spacing: -0.008em;
+  line-height: 1.2;
   text-decoration: none;
   color: var(--ink);
-  transition: color 0.2s var(--ease);
+  transition: color 0.25s var(--ease);
 }
 .site-header__name:hover { color: var(--accent); }
 
 .site-nav {
-  justify-self: center;
+  grid-column: 2;
+  justify-self: end;
   display: flex;
-  align-items: center;
-  gap: clamp(0.85rem, 2.5vw, 1.6rem);
+  align-items: baseline;
+  gap: clamp(0.9rem, 2.6vw, 1.7rem);
 }
 
 .site-nav a {
-  font-family: var(--mono);
-  font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  position: relative;
+  font-family: var(--display);
+  font-size: var(--t-base);
+  color: var(--muted);
   text-decoration: none;
-  padding-block: 0.35rem;
+  padding-block: 0.3rem;
   white-space: nowrap;
-  transition: color 0.2s var(--ease);
+  transition: color 0.25s var(--ease);
 }
 .site-nav a:hover { color: var(--ink); }
-.site-nav a[aria-current="page"] {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.5em;
+.site-nav a[aria-current="page"] { color: var(--ink); }
+
+/* The current page carries the plum point, centred under the word. */
+.site-nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.15rem;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
-/* Too narrow for one row: the nav drops below and stays centred. */
-@media (max-width: 40em) {
-  .site-header__inner {
-    grid-template-columns: 1fr auto;
-    row-gap: 0.5rem;
-  }
+/* Below this the row is too tight for name, four links and a toggle, so the
+   nav takes a line of its own and the toggle keeps the top row's right end. */
+@media (max-width: 34em) {
+  /* The nav on a line of its own makes the header about 5.9rem tall. Anchored
+     headings have to clear the taller header or they land underneath it. */
+  :root { --header-h: 5.9rem; }
+  .site-header__inner { grid-template-columns: minmax(0, 1fr) auto; }
   .site-nav {
     grid-column: 1 / -1;
     grid-row: 2;
+    justify-self: start;
+    margin-left: -0.15rem;
   }
+  .theme-toggle { grid-column: 2; grid-row: 1; }
+}
+
+/* A phone on its side has about 390px of height. A pinned header would take a
+   fifth of it, so on short viewports it scrolls away like everything else.
+   Last, so a viewport that is both narrow and short still lands on 0. */
+@media (max-height: 34em) {
+  .site-header { position: static; }
+  /* Nothing is pinned over the page, so there is nothing to clear. */
+  :root { --header-h: 0rem; }
 }
 
 .theme-toggle {
+  grid-column: 3;
   appearance: none;
   background: none;
   border: 0;
-  padding: 0.2rem;
-  margin: 0;
-  color: var(--ink-3);
+  padding: 0.25rem;
+  margin: 0 -0.25rem 0 0;
+  color: var(--faint);
   cursor: pointer;
   display: inline-flex;
-  transition: color 0.2s var(--ease);
+  align-self: center;
+  justify-self: end;
+  border-radius: 50%;
+  transition: color 0.25s var(--ease), transform 0.4s var(--ease);
 }
-.theme-toggle:hover { color: var(--ink); }
+.theme-toggle:hover { color: var(--accent); transform: rotate(25deg); }
+/* The one place the two themes have to be named twice. `color-scheme` decides
+   the colours but can't be selected on, so the icon has to work out for itself
+   which theme is showing: the OS setting unless an explicit choice overrides it.
+   The attribute rules come last so a stored choice beats the OS either way.
+
+   Without scripts the button can't do anything, so rather than show a control
+   that lies, there's no button and the OS setting simply stands. */
 .theme-toggle__moon { display: none; }
-:root[data-theme="dark"] .theme-toggle__sun { display: none; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle__sun  { display: none; }
+  :root:not([data-theme="light"]) .theme-toggle__moon { display: inline; }
+}
+
+:root[data-theme="dark"] .theme-toggle__sun  { display: none; }
 :root[data-theme="dark"] .theme-toggle__moon { display: inline; }
+
+:root.no-js .theme-toggle { display: none; }
+
+/* --- Load sequence ------------------------------------------------------- */
+
+/* One orchestrated moment: the name and the line under it rise into place
+   while the lattice comes up behind them. Nothing else on the site moves
+   without being touched.
+
+   Kept short on purpose. The masthead is the largest thing on the page, so for
+   as long as it is transparent the browser has painted nothing worth counting
+   and Largest Contentful Paint is still waiting. Anything that photographs the
+   page rather than reading it (a link preview, an audit, a crawler) sees
+   whatever frame it happens to catch. The whole sequence is now done inside
+   450ms instead of drifting past a second, which is still slow enough to read
+   as deliberate and fast enough not to be the thing holding the page up. */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.rise {
+  opacity: 0;
+  animation: rise 330ms var(--ease) forwards;
+}
+.rise--1 { animation-delay: 0ms; }
+.rise--2 { animation-delay: 60ms; }
+.rise--3 { animation-delay: 120ms; }
 
 /* --- Hero ---------------------------------------------------------------- */
 
 .hero {
-  padding-bottom: clamp(2rem, 3.5vw, 2.75rem);
+  padding-block: clamp(2.25rem, 6vw, 3.75rem) clamp(2rem, 4.5vw, 3rem);
 }
 
+/* The masthead: hangul, name, hanja, on one line, divided by the plum point.
+   A flex row rather than a text run, so the CJK can take its own size and the
+   whole thing wraps between scripts instead of mid-word when it has to. */
 .hero__name {
-  font-family: var(--display);
-  font-weight: 500;
-  font-size: clamp(2.5rem, 7.5vw, 4rem);
-  line-height: 1.02;
-  letter-spacing: -0.018em;
+  --cjk-scale: 0.82;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.1rem 0.52em;
   margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 7.2vw, 2.55rem);
+  line-height: 1.14;
+  letter-spacing: -0.02em;
 }
 
-/* The surname drops to its own line. */
-.hero__name span {
-  display: block;
+/* CJK glyphs fill their em box, so matched point sizes look mismatched. At
+   0.82em they sit at the same optical weight as the latin. */
+.hero__name-part--cjk {
+  font-size: calc(var(--cjk-scale) * 1em);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+/* The dividing point travels with the part it precedes, so it can't be left
+   dangling at a line end. Tied to position rather than to script, so reordering
+   the three parts can't leave the first one with a dot in front of it. Sized in
+   em, or it's a speck beside a 50px name. */
+.hero__name-part + .hero__name-part::before {
+  content: "";
+  display: inline-block;
+  width: 0.165em;
+  height: 0.165em;
+  margin-right: 0.62em;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: 0.28em;
+}
+
+/* Everything above is em, so on the latin part, which is a size up from the
+   CJK ones, the same dot would come out bigger. Sizing the marker itself down
+   by the CJK scale makes all the dots on the line identical. */
+.hero__name-part:not(.hero__name-part--cjk)::before {
+  font-size: calc(var(--cjk-scale) * 1em);
 }
 
 .hero__tagline {
-  margin: 1.5rem 0 0;
-  max-width: 42ch;
+  margin: 1.35rem 0 0;
+  max-width: 38ch;
   font-size: var(--t-md);
-  line-height: 1.45;
-  color: var(--ink-2);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--muted);
   text-wrap: pretty;
 }
 
-.hero__intro { margin-top: 1.25rem; max-width: 42ch; color: var(--ink-2); }
+.hero__intro {
+  margin-top: 1.75rem;
+  max-width: 46ch;
+  color: var(--muted);
+}
 .hero__intro > :first-child { margin-top: 0; }
+
+/* Past the reading column's own max-width the vw term stops helping, so the
+   masthead steps up by hand: first to what 44rem holds, then wider once the
+   page has a left margin to borrow back on the right. */
+@media (min-width: 44em) {
+  .hero__name { font-size: 2.55rem; }
+}
+
+@media (min-width: 72em) {
+  .hero { margin-right: calc(-1 * var(--margin)); }
+  .hero__name { font-size: 3.15rem; }
+  .hero__tagline, .hero__intro { margin-right: var(--margin); }
+}
 
 /* --- Section heads ------------------------------------------------------- */
 
-.section {
-  padding-top: clamp(1.75rem, 3vw, 2.25rem);
-}
+.section { padding-top: clamp(1.5rem, 3vw, 2rem); }
 
 .section__head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1.4rem;
 }
 
 .section__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-family: var(--mono);
   font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  letter-spacing: 0.06em;
+  color: var(--muted);
   margin: 0;
 }
 
+/* A section head is a heading, so it gets the mark too. */
+.section__title::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rule-2);
+  flex: none;
+}
+
 .section__aside {
-  font-family: var(--mono);
-  font-size: var(--label-size);
-  letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-family: var(--display);
+  font-size: var(--t-base);
+  color: var(--muted);
   text-decoration: none;
-  transition: color 0.2s var(--ease);
+  transition: color 0.25s var(--ease);
 }
 .section__aside:hover { color: var(--accent); }
 
 /* --- Archive ------------------------------------------------------------- */
 
+.archive__group + .archive__group { margin-top: 2.5rem; }
+
 .archive__year {
-  font-family: var(--mono);
-  font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: var(--label-track);
-  color: var(--ink-3);
-  margin: 2.75rem 0 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--rule);
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-lg);
+  line-height: 1;
+  color: var(--faint);
+  margin: 0 0 0.9rem;
+  font-variant-numeric: tabular-nums;
 }
-.archive__group:first-child .archive__year { margin-top: 0; }
 
 .archive__list {
   list-style: none;
@@ -362,82 +577,147 @@ a { color: inherit; }
   padding: 0;
 }
 
+/* Rows are separated by air, not by rules. The only line on the page appears
+   under the row you are pointing at. */
 .entry {
   position: relative;
   display: block;
   text-decoration: none;
-  padding: 1.15rem 0 1.15rem 0;
-  border-bottom: 1px solid var(--rule);
-  transition: padding-left 0.25s var(--ease);
+  padding: 1.1rem 0.9rem;
+  margin-inline: -0.9rem;
+  border-radius: var(--radius);
+  transition: background-color 0.3s var(--ease);
 }
+.entry:hover,
+.entry:focus-visible { background: var(--card); }
 
-/* No trailing rule at the end of a list, grouped by year or not. */
-/* An ultramarine rule slides in from the left on hover. */
-.entry::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 1.15rem;
-  bottom: 1.15rem;
-  width: 2px;
-  background: var(--accent);
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform 0.25s var(--ease);
-}
-.entry:hover::before,
-.entry:focus-visible::before { transform: scaleY(1); }
-
-@media (min-width: 40em) {
-  .entry:hover,
-  .entry:focus-visible { padding-left: 1.1rem; }
-}
-
+/* The mark holds its place whether or not it's showing, so the date hangs by
+   its own width and the words below it stay flush left. */
 .entry__date {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-left: -0.82rem;
   font-family: var(--mono);
   font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: var(--ink-3);
-  display: block;
-  margin-bottom: 0.4rem;
-  transition: color 0.2s var(--ease);
+  letter-spacing: var(--label-track);
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+  margin-bottom: 0.3rem;
+  transition: color 0.25s var(--ease);
 }
-.entry:hover .entry__date { color: var(--accent); }
+.entry:hover .entry__date { color: var(--muted); }
+
+/* The plum point only appears for the row under the cursor. */
+.entry__date .mark {
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.entry:hover .entry__date .mark,
+.entry:focus-visible .entry__date .mark { opacity: 1; transform: none; }
 
 .entry__title {
   font-family: var(--display);
-  font-weight: 500;
+  font-weight: 400;
   font-size: var(--t-lg);
-  line-height: 1.18;
-  letter-spacing: -0.008em;
+  line-height: 1.22;
+  letter-spacing: -0.012em;
   color: var(--ink);
   margin: 0;
   text-wrap: pretty;
+  transition: color 0.25s var(--ease);
 }
+.entry:hover .entry__title { color: var(--accent); }
 
 .entry__summary {
-  margin: 0.45rem 0 0;
-  color: var(--ink-2);
+  margin: 0.35rem 0 0;
+  color: var(--muted);
   font-size: var(--t-base);
-  line-height: 1.55;
+  line-height: 1.6;
   text-wrap: pretty;
 }
 
 .entry__meta {
-  margin: 0.6rem 0 0;
+  margin: 0.5rem 0 0;
   font-family: var(--mono);
   font-size: var(--t-sm);
-  color: var(--ink-3);
+  color: var(--faint);
+}
+
+/* Wide enough for a margin: the date leaves the row and hangs beside it, and
+   the year label goes with it. */
+@media (min-width: 72em) {
+  .archive__group { position: relative; }
+
+  /* Every hanging date carries its year, so the year heading has nothing left
+     to say. The gap between groups still marks where one year ends. */
+  .archive__year { display: none; }
+
+  .entry__date {
+    position: absolute;
+    left: calc(-1 * var(--margin));
+    top: 1.55rem;
+    width: calc(var(--margin) - 2.25rem);
+    justify-content: flex-end;
+    margin: 0;
+  }
+
+  .entry__date .mark { order: -1; transform: scale(0.4); }
+  .entry:hover .entry__date .mark,
+  .entry:focus-visible .entry__date .mark { transform: none; }
 }
 
 .empty {
-  color: var(--ink-3);
-  font-family: var(--mono);
-  font-size: var(--t-sm);
+  color: var(--faint);
+  font-style: italic;
 }
 
-.list-foot { margin: 2.25rem 0 0; }
+.list-foot { margin: 3rem 0 0; }
+
+/* --- Elsewhere ----------------------------------------------------------- */
+
+/* Name on the left, the address itself on the right, on one ruled row each.
+   The rules give the foot of the home page something to stand on. */
+.elsewhere {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.elsewhere li {
+  border-top: 1px solid var(--rule);
+}
+.elsewhere li:last-child { border-bottom: 1px solid var(--rule); }
+
+.elsewhere li > * {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.1rem 1.5rem;
+  padding: 0.85rem 0.6rem;
+  margin-inline: -0.6rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: background-color 0.3s var(--ease);
+}
+.elsewhere a:hover { background: var(--card); }
+
+.elsewhere__name {
+  font-family: var(--display);
+  font-size: var(--t-base);
+  color: var(--ink);
+  transition: color 0.25s var(--ease);
+}
+.elsewhere a:hover .elsewhere__name { color: var(--accent); }
+
+.elsewhere__hint {
+  font-family: var(--mono);
+  font-size: var(--t-sm);
+  color: var(--faint);
+  overflow-wrap: anywhere;
+}
 
 /* --- Tag bar ------------------------------------------------------------- */
 
@@ -445,62 +725,54 @@ a { color: inherit; }
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-bottom: 2.25rem;
+  margin-bottom: 2.5rem;
 }
 
 .tag-bar__item {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.4rem;
+  gap: 0.45rem;
   font-family: var(--mono);
   font-size: var(--t-sm);
-  color: var(--ink-3);
+  color: var(--muted);
   text-decoration: none;
-  padding: 0.3rem 0.7rem;
-  border: 1px solid var(--rule);
-  transition: color 0.2s var(--ease), border-color 0.2s var(--ease),
-              background-color 0.2s var(--ease);
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: var(--sunk);
+  transition: color 0.25s var(--ease), background-color 0.25s var(--ease);
 }
-.tag-bar__item:hover {
-  color: var(--ink);
-  border-color: var(--rule-2);
-}
+.tag-bar__item:hover { color: var(--ink); }
 .tag-bar__item.is-active {
   color: var(--accent);
-  border-color: var(--accent);
   background: var(--accent-w);
 }
 
 .tag-bar__count {
-  font-size: 0.82em;
-  color: var(--ink-3);
+  font-size: 0.85em;
+  color: var(--faint);
   font-variant-numeric: tabular-nums;
 }
 .tag-bar__item.is-active .tag-bar__count { color: var(--accent); }
 
 /* --- Page head ----------------------------------------------------------- */
 
-.page-head {
-  padding-bottom: 1.25rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-.page-head__eyebrow { display: block; margin-bottom: 1rem; }
+.page-head { margin-bottom: 3rem; }
 
 .page-head__title {
   font-family: var(--display);
-  font-weight: 500;
-  font-size: clamp(2.5rem, 7vw, 4rem);
-  line-height: 1;
-  letter-spacing: -0.015em;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 7vw, 3.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.022em;
   margin: 0;
 }
 
 .page-head__intro {
   margin-top: 1.25rem;
-  color: var(--ink-2);
+  max-width: 46ch;
+  color: var(--muted);
   font-size: var(--t-md);
+  font-style: italic;
   line-height: 1.5;
   text-wrap: pretty;
 }
@@ -508,120 +780,220 @@ a { color: inherit; }
 
 /* --- Post ---------------------------------------------------------------- */
 
-.post__head {
-  padding-bottom: 2rem;
-  margin-bottom: 2.5rem;
-  border-bottom: 1px solid var(--rule);
-}
+.post__head { margin-bottom: 3rem; }
 
 .post__eyebrow {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  margin-bottom: 1.25rem;
+  align-items: baseline;
+  gap: 0.5rem 0.9rem;
+  margin-bottom: 1.5rem;
+  color: var(--faint);
 }
+.post__eyebrow .label { color: var(--faint); }
+.post__eyebrow .sep { color: var(--rule-2); }
 
 .post__title {
   max-width: var(--measure);
   font-family: var(--display);
-  font-weight: 500;
-  font-size: clamp(2.25rem, 6vw, 3.5rem);
-  line-height: 1.06;
-  letter-spacing: -0.015em;
+  font-weight: 400;
+  font-size: clamp(2.3rem, 6.5vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
   margin: 0;
   text-wrap: balance;
 }
 
 .post__subtitle {
-  margin: 1.1rem 0 0;
-  max-width: var(--measure);
+  margin: 1.2rem 0 0;
+  max-width: 46ch;
   font-size: var(--t-md);
-  line-height: 1.45;
-  color: var(--ink-2);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--muted);
   text-wrap: pretty;
 }
 
-.post__foot {
-  margin-top: 4rem;
-}
+.post__foot { margin-top: 5rem; }
 
 .tags {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
+  gap: 0.5rem;
   padding: 0;
-  margin: 0 0 2.5rem;
+  margin: 0 0 3rem;
 }
 .tags a {
+  display: inline-block;
   font-family: var(--mono);
-  font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-size: var(--t-sm);
+  color: var(--muted);
   text-decoration: none;
-  transition: color 0.2s var(--ease);
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: var(--sunk);
+  transition: color 0.25s var(--ease), background-color 0.25s var(--ease);
 }
-.tags a::before { content: "#"; color: var(--rule-2); }
-.tags a:hover { color: var(--accent); }
+.tags a::before { content: "#"; color: var(--faint); }
+.tags a:hover { color: var(--accent); background: var(--accent-w); }
 
 .post-nav {
   display: grid;
-  gap: 1.5rem;
-  padding-top: 1.75rem;
+  gap: 1.75rem;
+  padding-top: 2rem;
   border-top: 1px solid var(--rule);
 }
 @media (min-width: 40em) {
-  .post-nav { grid-template-columns: 1fr 1fr; }
+  .post-nav { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
   .post-nav__side--right { text-align: right; }
 }
 
-.post-nav__label { display: block; margin-bottom: 0.35rem; }
+.post-nav__label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--faint);
+}
 
 .post-nav a {
   font-family: var(--display);
   font-size: var(--t-md);
-  line-height: 1.2;
+  line-height: 1.25;
   text-decoration: none;
-  transition: color 0.2s var(--ease);
+  transition: color 0.25s var(--ease);
 }
 .post-nav a:hover { color: var(--accent); }
 
 /* --- Table of contents --------------------------------------------------- */
 
+/* Narrow first: a ruled block between the title and the first paragraph, closer
+   to a caption than to a card. The filled slab it replaces was the one piece of
+   the page that could have come off any theme. */
 .toc {
-  margin: 0 0 3rem;
-  padding-left: 1.1rem;
-  border-left: 1px solid var(--rule);
+  margin: 0 0 3.25rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
 
-.toc__label { display: block; margin-bottom: 0.6rem; }
-.toc nav { max-width: var(--measure); }
+/* The label is the disclosure control, so the default triangle would be a
+   second one. `display: flex` also removes it in browsers that draw the marker
+   as a list item bullet. */
+.toc__label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  list-style: none;
+  cursor: pointer;
+  color: var(--faint);
+  transition: color 0.25s var(--ease);
+}
+.toc__label::-webkit-details-marker { display: none; }
+.toc__label:hover { color: var(--muted); }
 
-.toc ul { list-style: none; margin: 0; padding-left: 0; }
-.toc ul ul { padding-left: 1rem; }
-.toc li { margin: 0.35rem 0; line-height: 1.4; }
+/* The site's point, doing what it does everywhere else: marking the live one.
+   Plum while the list is open, a rule-coloured dot while it's folded away. */
+.toc__label::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rule-2);
+  flex: none;
+  transition: background-color 0.25s var(--ease);
+}
+.toc[open] .toc__label::before { background: var(--accent); }
+.toc[open] .toc__label { margin-bottom: 0.7rem; }
+
+.toc__list { list-style: none; margin: 0; padding-left: 0; }
+.toc__list .toc__list { padding-left: 0.9rem; }
+.toc li { margin: 0.3rem 0; line-height: 1.4; }
+
 .toc a {
-  color: var(--ink-2);
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  color: var(--muted);
   text-decoration: none;
   font-size: var(--t-sm);
-  transition: color 0.2s var(--ease);
+  transition: color 0.25s var(--ease);
 }
 .toc a:hover { color: var(--accent); }
 
+/* The point holds its place whether or not it is showing, the way the date
+   marks do in a post list, so nothing shifts sideways on hover. */
+.toc a .mark {
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.toc a:hover .mark,
+.toc a:focus-visible .mark { opacity: 1; transform: none; }
+
+/* The section being read. Same point, same job it does in the nav and in a post
+   list: it marks the live one. Set in ink so the list has one entry at reading
+   weight and the rest below it, which is the whole information the list carries
+   once you are inside the article. */
+.toc a.is-current { color: var(--ink); }
+.toc a.is-current .mark { opacity: 1; transform: none; }
+
+/* Wide enough for a margin, which is the width at which post dates leave the
+   row and hang beside it. The contents do the same thing: out of the reading
+   column, into the strip on its left, and pinned there while you read.
+
+   The article becomes a two-column grid pulled --margin to the left, so column
+   two starts exactly where the text started before. With no contents on the
+   page, column one is simply empty and nothing else moves. */
+@media (min-width: 72em) {
+  .post {
+    display: grid;
+    grid-template-columns: calc(var(--margin) - 2.25rem) minmax(0, 1fr);
+    column-gap: 2.25rem;
+    margin-left: calc(-1 * var(--margin));
+  }
+  .post > * { grid-column: 2; }
+  .post__head { grid-row: 1; }
+  .prose { grid-row: 2; }
+  .post__foot { grid-row: 3; }
+
+  .toc {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+    position: sticky;
+    top: calc(var(--header-h) + 1.75rem);
+    align-self: start;
+    /* A long contents list scrolls in the margin rather than off the top of it. */
+    max-height: calc(100svh - var(--header-h) - 4rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-2) transparent;
+    margin: 0;
+    /* Mono at label size sits higher than serif at reading size. The nudge puts
+       the word "Contents" on the same line as the first line of the article. */
+    padding: 0.28rem 0 0;
+    border: 0;
+  }
+
+  /* Set against the reading column, so the list has a straight edge along the
+     text and a ragged one against the empty margin. The point sits in the gap
+     between the two, on the text side, where the eye already is. */
+  .toc__label,
+  .toc a { flex-direction: row-reverse; text-align: right; }
+  .toc__list .toc__list { padding-left: 0; padding-right: 0.7rem; }
+  .toc li { margin: 0.45rem 0; }
+}
+
 /* --- Prose --------------------------------------------------------------- */
 
-.prose {
-  max-width: var(--measure);
-}
+.prose { max-width: var(--measure); }
 
 /* Reset every direct child, then space siblings. Both selectors are (0,1,0) so
    the later one wins. Resetting via a more specific rule such as
    `.prose p { margin: 0 }` (0,1,1) would silently beat the sibling rule and
    collapse the space between consecutive paragraphs. */
 .prose > * { margin: 0; }
-.prose > * + * { margin-top: 1.3em; }
+.prose > * + * { margin-top: 1.35em; }
 
 .prose p { text-wrap: pretty; }
 
@@ -629,35 +1001,33 @@ a { color: inherit; }
    and open a 100px hole above h2. */
 .prose h2, .prose h3, .prose h4 {
   font-family: var(--display);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.014em;
   margin: 0;
-  scroll-margin-top: 1.5rem;
+  scroll-margin-top: calc(var(--header-h) + 1rem);
   text-wrap: balance;
 }
-.prose h2 { font-size: var(--t-xl); margin-top: 3.5rem; }
-.prose h3 { font-size: var(--t-lg); margin-top: 2.75rem; }
+.prose h2 { font-size: var(--t-xl); margin-top: 3.75rem; }
+.prose h3 { font-size: var(--t-lg); margin-top: 3rem; }
 .prose h4 {
   margin-top: 2.5rem;
   font-family: var(--mono);
   font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  color: var(--muted);
 }
-.prose h2 + *, .prose h3 + *, .prose h4 + * { margin-top: 0.75rem; }
+.prose h2 + *, .prose h3 + *, .prose h4 + * { margin-top: 0.8rem; }
 
 .heading-anchor {
   font-family: var(--mono);
-  font-size: 0.55em;
+  font-size: 0.5em;
   text-decoration: none;
   color: var(--rule-2);
-  margin-left: 0.4em;
-  vertical-align: 0.28em;
+  margin-left: 0.45em;
+  vertical-align: 0.3em;
   opacity: 0;
-  transition: opacity 0.2s var(--ease), color 0.2s var(--ease);
+  transition: opacity 0.25s var(--ease), color 0.25s var(--ease);
 }
 h2:hover > .heading-anchor,
 h3:hover > .heading-anchor { opacity: 1; }
@@ -669,8 +1039,8 @@ h3:hover > .heading-anchor { opacity: 1; }
   text-decoration: underline;
   text-decoration-color: var(--rule-2);
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-  transition: color 0.2s var(--ease), text-decoration-color 0.2s var(--ease);
+  text-underline-offset: 0.2em;
+  transition: color 0.25s var(--ease), text-decoration-color 0.25s var(--ease);
 }
 .prose a:hover {
   color: var(--accent);
@@ -679,34 +1049,37 @@ h3:hover > .heading-anchor { opacity: 1; }
 
 .prose strong { font-weight: 600; }
 
-.prose ul, .prose ol { padding-left: 1.25em; }
-.prose li + li { margin-top: 0.45em; }
-.prose li > ul, .prose li > ol { margin-top: 0.45em; }
+.prose ul, .prose ol { padding-left: 1.3em; }
+.prose li + li { margin-top: 0.4em; }
+.prose li > ul, .prose li > ol { margin-top: 0.4em; }
 .prose li::marker { color: var(--rule-2); }
 
 .prose blockquote {
-  margin: 1.8em 0;
-  padding-left: 1.3em;
-  border-left: 1px solid var(--accent);
-  color: var(--ink-2);
+  margin: 1.9em 0;
+  padding: 0.2em 0 0.2em 1.5em;
+  border-left: 2px solid var(--accent-w);
+  color: var(--muted);
+  font-style: italic;
 }
 .prose blockquote > * + * { margin-top: 0.8em; }
 
 .prose hr {
   border: 0;
-  height: 1px;
-  background: var(--rule);
-  margin: 3em 0;
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background: var(--rule-2);
+  margin: 3.5em auto;
 }
 
-.prose .figure { margin: 2.25em 0; }
-.figure img { display: block; width: 100%; }
+.prose .figure { margin: 2.5em 0; }
+.figure img { display: block; width: 100%; border-radius: var(--radius); }
 .figure figcaption {
-  margin-top: 0.7rem;
+  margin-top: 0.75rem;
   font-family: var(--mono);
   font-size: var(--t-sm);
-  color: var(--ink-3);
-  line-height: 1.45;
+  color: var(--faint);
+  line-height: 1.5;
 }
 
 .prose table {
@@ -719,16 +1092,14 @@ h3:hover > .heading-anchor { opacity: 1; }
   text-align: left;
   font-family: var(--mono);
   font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-weight: 400;
+  color: var(--faint);
   border-bottom: 1px solid var(--rule-2);
   padding: 0.5rem 1rem 0.5rem 0;
 }
 .prose tbody td {
   border-bottom: 1px solid var(--rule);
-  padding: 0.55rem 1rem 0.55rem 0;
+  padding: 0.6rem 1rem 0.6rem 0;
   vertical-align: top;
 }
 
@@ -738,17 +1109,21 @@ h3:hover > .heading-anchor { opacity: 1; }
   font-family: var(--mono);
   font-size: 0.85em;
   background: var(--sunk);
-  padding: 0.1em 0.32em;
+  border-radius: 4px;
+  padding: 0.12em 0.36em;
   overflow-wrap: break-word;
 }
 
 .prose pre {
   background: var(--sunk);
-  border-left: 1px solid var(--rule-2);
-  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius);
+  padding: 1.2rem 1.35rem;
   overflow-x: auto;
   font-size: var(--t-sm);
-  line-height: 1.6;
+  line-height: 1.65;
+  /* A default scrollbar paints a white bar across the rounded bottom edge. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-2) transparent;
 }
 
 .prose pre code {
@@ -757,75 +1132,22 @@ h3:hover > .heading-anchor { opacity: 1; }
   font-size: inherit;
 }
 
-@media (min-width: 62em) {
-  .prose pre, .prose table, .figure { max-width: 100%; }
-}
-
-/* Chroma, tuned to the ultramarine palette. */
-.chroma .k, .chroma .kd, .chroma .kn, .chroma .kr, .chroma .kt, .chroma .kc { color: #2a2fb4; }
+/* Chroma, tuned to the plum-on-oat palette. Roles, not literals: the two
+   themes are already resolved by the --syn-* tokens at the top of the file. */
+.chroma .k, .chroma .kd, .chroma .kn, .chroma .kr, .chroma .kt, .chroma .kc,
+.chroma .nt { color: var(--syn-key); }
 .chroma .s, .chroma .s1, .chroma .s2, .chroma .sb, .chroma .sc, .chroma .sd,
-.chroma .se, .chroma .sh, .chroma .si, .chroma .sx, .chroma .sr, .chroma .ss { color: #1d6b57; }
-.chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi, .chroma .mo { color: #8a1e3c; }
-.chroma .c, .chroma .c1, .chroma .cm, .chroma .cs, .chroma .cp, .chroma .cpf { color: #7e888f; font-style: italic; }
-.chroma .nf, .chroma .nd { color: #0f1519; font-weight: 600; }
-.chroma .nc, .chroma .nn { color: #8a1e3c; }
-.chroma .nb, .chroma .bp { color: #4b565d; }
-.chroma .nt { color: #2a2fb4; }
-.chroma .na { color: #1d6b57; }
-.chroma .o, .chroma .ow, .chroma .p { color: #6e787f; }
-.chroma .err { color: #8a1e3c; }
-.chroma .gd { color: #8a1e3c; }
-.chroma .gi { color: #1d6b57; }
+.chroma .se, .chroma .sh, .chroma .si, .chroma .sx, .chroma .sr, .chroma .ss,
+.chroma .na, .chroma .gi { color: var(--syn-str); }
+.chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi, .chroma .mo,
+.chroma .nc, .chroma .nn { color: var(--syn-num); }
+.chroma .c, .chroma .c1, .chroma .cm, .chroma .cs, .chroma .cp, .chroma .cpf { color: var(--syn-dim); font-style: italic; }
+.chroma .o, .chroma .ow, .chroma .p { color: var(--syn-dim); }
+.chroma .nb, .chroma .bp { color: var(--muted); }
+.chroma .nf, .chroma .nd { color: var(--syn-name); font-weight: 600; }
+.chroma .err, .chroma .gd { color: var(--syn-err); }
 .chroma .ge { font-style: italic; }
 .chroma .gs { font-weight: 600; }
-
-:root[data-theme="dark"] .chroma .k, :root[data-theme="dark"] .chroma .kd,
-:root[data-theme="dark"] .chroma .kn, :root[data-theme="dark"] .chroma .kr,
-:root[data-theme="dark"] .chroma .kt, :root[data-theme="dark"] .chroma .kc { color: #9095f2; }
-:root[data-theme="dark"] .chroma .s, :root[data-theme="dark"] .chroma .s1,
-:root[data-theme="dark"] .chroma .s2, :root[data-theme="dark"] .chroma .sb,
-:root[data-theme="dark"] .chroma .sc, :root[data-theme="dark"] .chroma .sd,
-:root[data-theme="dark"] .chroma .se, :root[data-theme="dark"] .chroma .sh,
-:root[data-theme="dark"] .chroma .si, :root[data-theme="dark"] .chroma .sx,
-:root[data-theme="dark"] .chroma .sr, :root[data-theme="dark"] .chroma .ss { color: #6fc0a4; }
-:root[data-theme="dark"] .chroma .m, :root[data-theme="dark"] .chroma .mb,
-:root[data-theme="dark"] .chroma .mf, :root[data-theme="dark"] .chroma .mh,
-:root[data-theme="dark"] .chroma .mi, :root[data-theme="dark"] .chroma .mo { color: #e6879c; }
-:root[data-theme="dark"] .chroma .c, :root[data-theme="dark"] .chroma .c1,
-:root[data-theme="dark"] .chroma .cm, :root[data-theme="dark"] .chroma .cs,
-:root[data-theme="dark"] .chroma .cp, :root[data-theme="dark"] .chroma .cpf { color: #6e787f; font-style: italic; }
-:root[data-theme="dark"] .chroma .nf, :root[data-theme="dark"] .chroma .nd { color: #e3e8eb; font-weight: 600; }
-:root[data-theme="dark"] .chroma .nc, :root[data-theme="dark"] .chroma .nn { color: #e6879c; }
-:root[data-theme="dark"] .chroma .nb, :root[data-theme="dark"] .chroma .bp { color: #9ca7ae; }
-:root[data-theme="dark"] .chroma .nt { color: #9095f2; }
-:root[data-theme="dark"] .chroma .na { color: #6fc0a4; }
-:root[data-theme="dark"] .chroma .o, :root[data-theme="dark"] .chroma .ow,
-:root[data-theme="dark"] .chroma .p { color: #78838a; }
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .chroma .k, :root:not([data-theme="light"]) .chroma .kd,
-  :root:not([data-theme="light"]) .chroma .kn, :root:not([data-theme="light"]) .chroma .kr,
-  :root:not([data-theme="light"]) .chroma .kt, :root:not([data-theme="light"]) .chroma .kc { color: #9095f2; }
-  :root:not([data-theme="light"]) .chroma .s, :root:not([data-theme="light"]) .chroma .s1,
-  :root:not([data-theme="light"]) .chroma .s2, :root:not([data-theme="light"]) .chroma .sb,
-  :root:not([data-theme="light"]) .chroma .sc, :root:not([data-theme="light"]) .chroma .sd,
-  :root:not([data-theme="light"]) .chroma .se, :root:not([data-theme="light"]) .chroma .sh,
-  :root:not([data-theme="light"]) .chroma .si, :root:not([data-theme="light"]) .chroma .sx,
-  :root:not([data-theme="light"]) .chroma .sr, :root:not([data-theme="light"]) .chroma .ss { color: #6fc0a4; }
-  :root:not([data-theme="light"]) .chroma .m, :root:not([data-theme="light"]) .chroma .mb,
-  :root:not([data-theme="light"]) .chroma .mf, :root:not([data-theme="light"]) .chroma .mh,
-  :root:not([data-theme="light"]) .chroma .mi, :root:not([data-theme="light"]) .chroma .mo { color: #e6879c; }
-  :root:not([data-theme="light"]) .chroma .c, :root:not([data-theme="light"]) .chroma .c1,
-  :root:not([data-theme="light"]) .chroma .cm, :root:not([data-theme="light"]) .chroma .cs,
-  :root:not([data-theme="light"]) .chroma .cp, :root:not([data-theme="light"]) .chroma .cpf { color: #6e787f; font-style: italic; }
-  :root:not([data-theme="light"]) .chroma .nf, :root:not([data-theme="light"]) .chroma .nd { color: #e3e8eb; font-weight: 600; }
-  :root:not([data-theme="light"]) .chroma .nc, :root:not([data-theme="light"]) .chroma .nn { color: #e6879c; }
-  :root:not([data-theme="light"]) .chroma .nb, :root:not([data-theme="light"]) .chroma .bp { color: #9ca7ae; }
-  :root:not([data-theme="light"]) .chroma .nt { color: #9095f2; }
-  :root:not([data-theme="light"]) .chroma .na { color: #6fc0a4; }
-  :root:not([data-theme="light"]) .chroma .o, :root:not([data-theme="light"]) .chroma .ow,
-  :root:not([data-theme="light"]) .chroma .p { color: #78838a; }
-}
 
 /* --- Projects ------------------------------------------------------------ */
 
@@ -834,32 +1156,36 @@ h3:hover > .heading-anchor { opacity: 1; }
   list-style: none;
   padding-left: 0;
   margin: 0;
+  display: grid;
+  gap: 0.75rem;
 }
 
 .project-list > li {
-  padding: 1.5rem 0;
-  border-top: 1px solid var(--rule);
+  padding: 1.4rem 1.5rem;
+  background: var(--card);
+  border-radius: var(--radius);
+  transition: background-color 0.3s var(--ease);
 }
-.project-list > li:first-child { border-top: 0; padding-top: 0.5rem; }
-.project-list > li:last-child { border-bottom: 1px solid var(--rule); }
+.project-list > li:hover { background: var(--sunk); }
 
-.project__name {
+.project-list .project__name {
   font-family: var(--display);
   font-size: var(--t-lg);
-  font-weight: 500;
-  letter-spacing: -0.008em;
-  margin: 0 0 0.5rem;
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.25;
+  margin: 0 0 0.45rem;
 }
-.project__name a {
+.project-list .project__name a {
   text-decoration: none;
-  transition: color 0.2s var(--ease);
+  transition: color 0.25s var(--ease);
 }
-.project__name a:hover { color: var(--accent); }
+.project-list .project__name a:hover { color: var(--accent); }
 
 .project__body {
   max-width: var(--measure);
-  color: var(--ink-2);
-  line-height: 1.55;
+  color: var(--muted);
+  line-height: 1.65;
 }
 .project__body p { margin: 0; text-wrap: pretty; }
 .project__body p + p { margin-top: 0.7em; }
@@ -867,33 +1193,30 @@ h3:hover > .heading-anchor { opacity: 1; }
   font-family: var(--mono);
   font-size: 0.85em;
   background: var(--sunk);
-  padding: 0.1em 0.32em;
+  border-radius: 4px;
+  padding: 0.12em 0.36em;
 }
 
 .project__meta {
-  margin: 0.75rem 0 0;
+  margin: 0.8rem 0 0;
   font-family: var(--mono);
-  font-size: var(--label-size);
-  letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-size: var(--t-sm);
+  color: var(--faint);
 }
 
 /* --- Facts (about page) -------------------------------------------------- */
 
 .facts {
-  margin: 2.5rem 0 0;
+  margin: 3rem 0 0;
   display: grid;
-  gap: 0;
+  gap: 0.15rem;
 }
 
 .facts__row {
   display: grid;
-  gap: 0.15rem 1.5rem;
-  padding: 0.9rem 0;
-  border-top: 1px solid var(--rule);
+  gap: 0.1rem 1.5rem;
+  padding: 0.75rem 0;
 }
-.facts__row:last-child { border-bottom: 1px solid var(--rule); }
 
 @media (min-width: 34em) {
   .facts__row { grid-template-columns: 7.5rem minmax(0, 1fr); }
@@ -902,19 +1225,26 @@ h3:hover > .heading-anchor { opacity: 1; }
 .facts__key {
   font-family: var(--mono);
   font-size: var(--label-size);
-  font-weight: 500;
   letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
-  padding-top: 0.2em;
+  color: var(--faint);
+  padding-top: 0.3em;
 }
 
-.facts__val { max-width: var(--measure); color: var(--ink); line-height: 1.5; }
+.facts__val { max-width: var(--measure); color: var(--ink); line-height: 1.6; }
+
+.facts__val a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-2);
+  text-underline-offset: 0.2em;
+  transition: color 0.25s var(--ease), text-decoration-color 0.25s var(--ease);
+}
+.facts__val a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 
 /* The address reads as data, so it's set like data. */
 .email {
   font-family: var(--mono);
-  font-size: 0.9em;
+  font-size: 0.88em;
   white-space: nowrap;
 }
 
@@ -924,87 +1254,96 @@ h3:hover > .heading-anchor { opacity: 1; }
   display: block;
   overflow-x: auto;
   overflow-y: hidden;
-  padding-block: 0.35rem;
+  padding-block: 0.4rem;
 }
-.facts__val a {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--rule-2);
-  text-underline-offset: 0.18em;
-  transition: color 0.2s var(--ease), text-decoration-color 0.2s var(--ease);
-}
-.facts__val a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 
 /* --- 404 ----------------------------------------------------------------- */
 
-.notfound { max-width: var(--measure); padding-top: 2rem; }
-.notfound__code { display: block; margin-bottom: 1rem; }
+.notfound { max-width: var(--measure); padding-top: 3rem; }
+.notfound__code {
+  display: block;
+  margin-bottom: 1.25rem;
+  color: var(--faint);
+}
 .notfound__title {
   font-family: var(--display);
-  font-weight: 500;
-  font-size: clamp(2.25rem, 6vw, 3.5rem);
-  line-height: 1.06;
-  letter-spacing: -0.015em;
-  margin: 0 0 1.25rem;
+  font-weight: 400;
+  font-size: clamp(2.3rem, 6.5vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  margin: 0 0 1.5rem;
 }
-.notfound__body { margin: 0; color: var(--ink-2); }
+.notfound__body { margin: 0; color: var(--muted); max-width: 46ch; }
 .notfound__body a {
   color: var(--ink);
+  text-decoration: underline;
   text-decoration-color: var(--rule-2);
-  text-underline-offset: 0.18em;
+  text-underline-offset: 0.2em;
+  transition: color 0.25s var(--ease), text-decoration-color 0.25s var(--ease);
 }
-.notfound__body a:hover { color: var(--accent); }
+.notfound__body a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 
 /* --- Footer -------------------------------------------------------------- */
 
-.site-footer {
-  flex-shrink: 0;
-  border-top: 1px solid var(--rule);
-}
+.site-footer { flex-shrink: 0; }
 
 .site-footer__inner {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 2rem;
+  gap: 0.5rem 2rem;
   justify-content: space-between;
-  align-items: center;
-  padding-block: 1.75rem 2.5rem;
+  align-items: baseline;
+  padding-block: 2rem 3rem;
+  border-top: 1px solid var(--rule);
 }
 
-.site-footer__copy {
-  margin: 0;
-  font-family: var(--mono);
-  font-size: var(--t-sm);
-  color: var(--ink-3);
-}
-
+.site-footer__copy,
 .site-footer__email {
   margin: 0;
   font-family: var(--mono);
   font-size: var(--t-sm);
-  color: var(--ink-3);
+  color: var(--faint);
+}
+
+.site-footer__email {
   flex-basis: 100%;
   order: 3;
+  margin-top: 0.4rem;
 }
 
 .site-footer__links { display: flex; gap: 1.5rem; }
 .site-footer__links a {
-  font-family: var(--mono);
-  font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: var(--label-track);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-family: var(--display);
+  font-size: var(--t-base);
+  color: var(--muted);
   text-decoration: none;
-  transition: color 0.2s var(--ease);
+  transition: color 0.25s var(--ease);
 }
 .site-footer__links a:hover { color: var(--accent); }
+
+/* --- Reduced motion ------------------------------------------------------ */
+
+/* Last, so it beats the animation declarations above rather than racing them.
+   Everything still arrives; it just arrives already in place. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .lattice, .rise { opacity: 1; }
+}
 
 /* --- Print --------------------------------------------------------------- */
 
 @media print {
   .site-header, .site-footer, .post-nav, .toc, .skip-link,
-  .heading-anchor { display: none; }
+  .lattice, .heading-anchor { display: none; }
+  /* Printing may never run the load animation, and unfinished means invisible. */
+  .rise { opacity: 1; animation: none; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .page { padding: 0; }
   .prose, .post__head { max-width: none; }

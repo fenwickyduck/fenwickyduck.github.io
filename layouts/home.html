@@ -1,16 +1,26 @@
 {{ define "main" }}
 <section class="hero">
-  {{- /* Split on the last space so the surname can drop to its own line. */}}
-  {{- $parts := split site.Title " " }}
-  <h1 class="hero__name">
-    {{- delimit (first (sub (len $parts) 1) $parts) " " }}<span>{{ index $parts (sub (len $parts) 1) }}</span>
+  {{- /* One line, three scripts: hangul, latin, hanja, divided by the plum
+         point the rest of the site uses as its mark. Either CJK part can be
+         empty in hugo.toml and the line just gets shorter. */}}
+  {{- /* The dividing point is drawn by each part's own ::before, not by a span
+         of its own, so a wrap can never leave a dot stranded at the end of a
+         line. The first part on the line never gets one, whichever it is. */}}
+  <h1 class="hero__name rise rise--1">
+    {{- with site.Params.nameKo }}
+    <span class="hero__name-part hero__name-part--cjk" lang="ko">{{ . }}</span>
+    {{- end }}
+    <span class="hero__name-part" lang="en">{{ site.Title }}</span>
+    {{- with site.Params.nameHanja }}
+    <span class="hero__name-part hero__name-part--cjk" lang="zh">{{ . }}</span>
+    {{- end }}
   </h1>
   {{- /* Set in content/_index.md, so the whole home page lives in one file. */}}
   {{- with .Params.tagline }}
-  <p class="hero__tagline">{{ . }}</p>
+  <p class="hero__tagline rise rise--2">{{ . }}</p>
   {{- end }}
   {{- with .Content }}
-  <div class="hero__intro prose">{{ . }}</div>
+  <div class="hero__intro prose rise rise--3">{{ . }}</div>
   {{- end }}
 </section>
 
@@ -20,9 +30,33 @@
   <div class="section__head">
     <h2 class="section__title">Writing</h2>
     {{- if gt (len $posts) (len $recent) }}
-    <a class="section__aside" href="{{ "/writing/" | relURL }}">All {{ len $posts }}</a>
+    <a class="section__aside" href="{{ "/writing/" | relURL }}">All {{ len $posts }} posts</a>
     {{- end }}
   </div>
   {{ partial "post-list.html" (dict "pages" $recent "grouped" false) }}
+</section>
+
+<section class="section">
+  <div class="section__head">
+    <h2 class="section__title">Elsewhere</h2>
+  </div>
+  {{- /* The second column is the address itself, not a description of it, so
+         nothing here has to be written in anyone's voice. */}}
+  <ul class="elsewhere">
+    {{- with site.Params.github }}
+    <li><a href="{{ . }}" rel="me noopener"><span class="elsewhere__name">GitHub</span><span class="elsewhere__hint">{{ replaceRE "^https?://(www\\.)?|/$" "" . }}</span></a></li>
+    {{- end }}
+    {{- with site.Params.linkedin }}
+    <li><a href="{{ . }}" rel="me noopener"><span class="elsewhere__name">LinkedIn</span><span class="elsewhere__hint">{{ replaceRE "^https?://(www\\.)?|/$" "" . }}</span></a></li>
+    {{- end }}
+    {{- with site.Home.OutputFormats.Get "rss" }}
+    <li><a href="{{ .RelPermalink }}"><span class="elsewhere__name">RSS</span><span class="elsewhere__hint">{{ .RelPermalink }}</span></a></li>
+    {{- end }}
+    {{- /* Not a link, but it still needs the single wrapper the row layout
+           expects, or the name and the address land on separate lines. */}}
+    {{- if site.Params.emailUser }}
+    <li><div><span class="elsewhere__name">Email</span><span class="elsewhere__hint">{{ partial "email.html" . }}</span></div></li>
+    {{- end }}
+  </ul>
 </section>
 {{ end }}

@@ -6,14 +6,70 @@ requests off the origin. Fonts are self-hosted in `static/fonts/`.
 
 ## Design
 
-Blueprint-grey ground, blue-cast ink, one ultramarine accent. Display type is
-Newsreader, which also sets the body text; every label, date and tag is IBM
-Plex Mono. Both self-hosted, latin subset, about 116 KB in total.
+Oat-sage paper, warm charcoal ink, one muted plum accent. Newsreader sets the
+display and the reading text, with its italic on taglines and subtitles; IBM
+Plex Mono handles dates and data, in sentence case. Six glyphs of Noto Serif KR
+carry the hangul and hanja in the masthead. All self-hosted and cut down to
+what the site actually sets, about 114 KB in total.
 
-There's no illustration and no imagery. Hierarchy comes from scale, from the
-contrast between a serif at reading size and small tracked-out monospace labels,
-and from a lot of white space. The only colour beyond ink and paper is one
-ultramarine accent, used on links, current-page markers and hover states.
+The home page opens on the name in three scripts on one line — `Seyoon Park`,
+then hangul, then hanja — divided by the plum point the rest of the site uses
+as its mark. The CJK is set at 0.82em because a matched point size doesn't
+match: those glyphs fill their em box where the latin doesn't.
+
+Every page opens over a lattice: a hexagonal field of points that thins out and
+disappears before the reading text starts. It's drawn by two offset radial
+gradients in `.lattice`, so it costs no request and no markup beyond one empty
+`<div>`. In two dimensions that lattice is the densest packing there is, which
+is roughly what this site is about.
+
+The plum shows up in a few places and nowhere else: under the current nav item,
+between the scripts in the masthead, and next to a post's date when you point
+at it. Rows are separated by space rather than by rules, and the writing list
+hangs its dates in the left margin once the window is wide enough to spare one.
+
+The header is the same on every page, home included, and sticks to the top of
+the window unless the window is too short to spare the room. It used to drop
+the name on the home page, which meant the header changed shape as you moved
+around the site.
+
+On load, the name and the tagline rise into place while the lattice comes up
+behind them. Nothing else on the site moves unless you touch it, and under
+`prefers-reduced-motion` nothing moves at all.
+
+Keep that sequence short if you change it. The masthead is the biggest thing on
+the page, so while it's transparent the browser has painted nothing that counts
+and Largest Contentful Paint is still waiting on it. Anything that photographs
+the page rather than reading it catches whatever frame it lands on.
+
+## The name
+
+`hugo.toml` holds three pieces of it. The masthead sets them in that order,
+hangul first and the latin in the middle:
+
+```toml
+nameKo    = "박세윤"          # under [params]
+title     = "Seyoon Park"   # top level, not under [params]
+nameHanja = "朴世阭"          # under [params]
+```
+
+Empty either CJK one and that part of the masthead disappears. The header and
+the page titles only ever use `title`.
+
+Shipping a CJK family for six characters would cost about 15 MB, so
+`static/fonts/noto-serif-kr-*.woff2` is Noto Serif KR cut down to exactly the
+characters above: 2 KB a weight. **Change the characters and the font has to be
+recut**, or they'll fall back to whatever serif the reader happens to have:
+
+```sh
+./scripts/name-font.sh                    # uses the characters in the script
+./scripts/name-font.sh '박세윤朴世阭 안녕'   # or pass your own
+```
+
+It fetches from Google, subsets, writes to `static/fonts/`, and fails loudly if
+any character you asked for isn't in the font. Needs `pip install
+'fonttools[woff]'`. Nothing is fetched at page-load time; readers only ever talk
+to this origin.
 
 ## Editing the pages
 
@@ -21,7 +77,7 @@ Two files, and neither needs you to touch a template.
 
 `content/_index.md` is the **home page**. The grey line under your name is the
 `tagline` field in its front matter. Anything you write below the `---` appears
-under that tagline. Your name itself is `title` in `hugo.toml`.
+under that tagline. Your name itself lives in `hugo.toml`; see *The name* above.
 
 `content/about.md` is the **about page**. Ordinary markdown, except for the
 key/value table near the bottom, which is plain HTML: copy a
@@ -69,6 +125,12 @@ toc: true                                    # optional table of contents
 ---
 ```
 
+`toc: true` needs at least three headings before anything appears; below that a
+contents list is just the headings again. On a wide window it hangs in the left
+margin and stays there as you scroll, on a narrow one it sits above the article
+and folds away when you click the label. It shows h2 and h3, which is
+`tocDepth` in `hugo.toml`.
+
 ## Previewing locally
 
 ```sh
@@ -113,7 +175,9 @@ layouts/
 assets/
   css/main.css          the entire theme
   js/theme.js           light/dark toggle
-static/fonts/           self-hosted woff2, latin subset (~116 KB total)
+scripts/
+  name-font.sh          recuts the CJK subset for the masthead name
+static/fonts/           self-hosted woff2 (~114 KB total)
 ```
 
 ## Notes
@@ -127,6 +191,11 @@ static/fonts/           self-hosted woff2, latin subset (~116 KB total)
   Don't reset margins with anything more specific (`.prose p { margin: 0 }` is
   (0,1,1)) — it wins regardless of order and silently closes the gaps between
   paragraphs.
+- **Headings inside prose** are styled by `.prose h2, .prose h3, .prose h4`,
+  which match *any* heading below `.prose`, not just direct children. A heading
+  inside a shortcode gets the same 3 rem top margin unless it's targeted by a
+  selector with two classes, which is why the project name is
+  `.project-list .project__name`.
 - **Adding a project** to `/projects/`: copy a `{{</* project */>}}` block in
   `content/projects.md`.
 - **Maths** is LaTeX: `$x$` inline, `$$x$$` for display. Hugo renders it to

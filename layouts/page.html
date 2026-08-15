@@ -4,20 +4,16 @@
   <header class="post__head">
     {{- if $isPost }}
     <div class="post__eyebrow">
-      <span class="label"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 January 2006" }}</time></span>
-      <span class="label">{{ .ReadingTime }} min</span>
+      <span class="label"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 January 2006" }}</time></span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span class="label">{{ .ReadingTime }} min read</span>
     </div>
     {{- end }}
     <h1 class="post__title">{{ .Title }}</h1>
     {{- with .Params.subtitle }}<p class="post__subtitle">{{ . }}</p>{{ end }}
   </header>
 
-  {{- if and .Params.toc (gt (len .TableOfContents) 60) }}
-  <nav class="toc" aria-label="Table of contents">
-    <span class="label toc__label">Contents</span>
-    {{ .TableOfContents }}
-  </nav>
-  {{- end }}
+  {{ partial "toc.html" . }}
 
   <div class="prose">
     {{ .Content }}

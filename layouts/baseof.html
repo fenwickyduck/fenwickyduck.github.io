@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html lang="{{ or site.Language.Locale "en" }}" data-theme="light">
+{{- /* No `data-theme` here on purpose. The CSS says `color-scheme: light dark`,
+       so an unmarked page already follows the reader's OS; the inline script in
+       <head> only stamps an attribute when there's a choice to record. Hard-coding
+       `data-theme="light"` here would pin every scriptless reader to light. */ -}}
+<html lang="{{ or site.Language.Locale "en" }}" class="no-js">
 <head>
   {{ partial "head.html" . }}
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
+  {{- /* The point field. Decoration only, so it's hidden from the reader of a
+         screen reader and sits behind everything else. */}}
+  <div class="lattice" aria-hidden="true"></div>
   {{ partial "header.html" . }}
   <main id="main" class="page">
     <div class="shell">

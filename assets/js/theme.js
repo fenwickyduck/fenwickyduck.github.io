@@ -1,29 +1,33 @@
-// Light/dark toggle. The initial value is set inline in <head> to avoid a
-// flash; this only handles clicks and keeps following the OS until the user
-// makes an explicit choice.
+// Light/dark toggle.
+//
+// The CSS does the actual work: `color-scheme: light dark` on :root means an
+// unmarked page already follows the OS, live, with nothing listening. So this
+// file has one job, which is to record a choice that differs from the OS.
+//
+// Choosing the theme the OS is already on clears the record instead of pinning
+// it, so a reader who toggles twice is back to following their system.
 (function () {
   var root = document.documentElement;
   var button = document.querySelector('.theme-toggle');
   if (!button) return;
 
-  button.addEventListener('click', function () {
-    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', next);
-    root.setAttribute('theme-source', 'user');
-    try {
-      localStorage.setItem('theme', next);
-    } catch (e) {}
-  });
-
   var media = window.matchMedia('(prefers-color-scheme: dark)');
-  var onChange = function (event) {
-    if (root.getAttribute('theme-source') === 'user') return;
-    root.setAttribute('data-theme', event.matches ? 'dark' : 'light');
-  };
 
-  if (media.addEventListener) {
-    media.addEventListener('change', onChange);
-  } else if (media.addListener) {
-    media.addListener(onChange);
-  }
+  button.addEventListener('click', function () {
+    var showing = root.getAttribute('data-theme') || (media.matches ? 'dark' : 'light');
+    var next = showing === 'dark' ? 'light' : 'dark';
+    var system = media.matches ? 'dark' : 'light';
+
+    try {
+      if (next === system) {
+        root.removeAttribute('data-theme');
+        localStorage.removeItem('theme');
+      } else {
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+      }
+    } catch (e) {
+      root.setAttribute('data-theme', next);
+    }
+  });
 })();

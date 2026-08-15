@@ -11,10 +11,10 @@ and open `/formatting-reference/` to check nothing broke after a CSS change.
 
 ## Headings and body text
 
-Body copy is IBM Plex Sans at a measure of about 68 characters. Headings are
-Bodoni Moda, which is why they're only used large — a didone falls apart at
-small sizes. Paragraphs carry **bold**, *italic*, `inline code`, and
-[links](https://gohugo.io), underlined thinly with a generous offset.
+Body copy is Newsreader at a measure of about 68 characters, and headings are
+the same face a few weights lighter, so the page never changes voice. Paragraphs
+carry **bold**, *italic*, `inline code`, and [links](https://gohugo.io),
+underlined thinly with a generous offset.
 
 ### A third-level heading
 

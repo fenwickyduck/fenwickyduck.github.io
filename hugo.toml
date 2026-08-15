@@ -28,6 +28,16 @@ buildFuture = false
 
 [params]
   author = "Seyoon Park"
+
+  # The masthead on the home page reads: hangul, then the latin name, then
+  # hanja. Leave either of these empty and that part simply doesn't appear.
+  #
+  # The characters are baked into a 2 KB subset of Noto Serif KR. If you change
+  # them here, run ./scripts/name-font.sh with the new string or they'll fall
+  # back to whatever serif the reader happens to have.
+  nameKo = "박세윤"
+  nameHanja = "朴世阭"
+
   description = "Seyoon Park — computer science at Oxford, writing about cryptography, quantum computation and contest problems."
   # The home page headline lives in content/_index.md, not here.
 
@@ -40,6 +50,11 @@ buildFuture = false
   linkedin = "https://www.linkedin.com/in/seyoon-park-andrew/"
   # Set to false to hide the light/dark toggle.
   showThemeToggle = true
+
+  # How deep the contents list on a post goes. 3 means h2 and h3; the h4s on
+  # this site are labels rather than sections, so they stay out of it. Read by
+  # layouts/_partials/toc.html, which is the only thing that builds a TOC.
+  tocDepth = 3
 
 # pageRef, not url: it resolves to a real page, which is what lets Hugo mark
 # the current item. With `url` the active state silently never matches.
@@ -80,9 +95,10 @@ buildFuture = false
     lineNos = false
     tabWidth = 2
     guessSyntax = true
-  [markup.tableOfContents]
-    startLevel = 2
-    endLevel = 3
+  # No [markup.tableOfContents] here on purpose. It only configures Hugo's
+  # prebuilt `.TableOfContents`, which nothing on this site calls: the contents
+  # list is built from `.Fragments`, which ignores that section entirely.
+  # Depth lives in [params] as `tocDepth`.
 
 [taxonomies]
   tag = "tags"
