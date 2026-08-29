@@ -1,5 +1,5 @@
 ---
-title: "Projects"
+title: "Tools"
 description: "Things Seyoon Park has built."
 ---
 

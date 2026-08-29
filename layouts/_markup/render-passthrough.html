@@ -1,7 +1,9 @@
 {{- /*
-  Turns LaTeX into MathML at build time. Hugo has KaTeX compiled in, so nothing
-  is sent to the browser: no script, no stylesheet, no maths fonts. Browsers
-  render MathML natively.
+  Turns LaTeX into MathML at build time. Hugo has KaTeX compiled in, so no
+  script or stylesheet is sent to the browser; browsers render MathML natively.
+  The one shipped asset is the Latin Modern Math web font (see main.css), so the
+  maths looks the same for every reader rather than falling back to whatever
+  math font their browser bundles.
 */ -}}
 {{- if eq .Type "block" -}}
   {{- transform.ToMath .Inner (dict "displayMode" true) -}}

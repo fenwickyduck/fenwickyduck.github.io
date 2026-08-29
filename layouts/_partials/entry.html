@@ -7,7 +7,7 @@
     </span>
     <h4 class="entry__title">{{ .Title }}</h4>
     {{- with .Params.subtitle }}
-    <p class="entry__summary">{{ . }}</p>
+    <p class="entry__summary">{{ $.RenderString . }}</p>
     {{- end }}
     <p class="entry__meta">
       {{- .ReadingTime }} min read

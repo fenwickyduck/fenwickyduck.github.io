@@ -10,7 +10,7 @@
     </div>
     {{- end }}
     <h1 class="post__title">{{ .Title }}</h1>
-    {{- with .Params.subtitle }}<p class="post__subtitle">{{ . }}</p>{{ end }}
+    {{- with .Params.subtitle }}<p class="post__subtitle">{{ $.RenderString . }}</p>{{ end }}
   </header>
 
   {{ partial "toc.html" . }}

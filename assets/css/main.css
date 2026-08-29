@@ -63,6 +63,17 @@
   font-display: swap;
 }
 
+/* Latin Modern Math (the OpenType Computer Modern) shipped so the maths reads
+   the same everywhere, not left to whatever math font the reader happens to
+   have. Fetched only on pages that actually contain maths. */
+@font-face {
+  font-family: "Latin Modern Math";
+  src: url("/fonts/latinmodern-math.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* --- Tokens -------------------------------------------------------------- */
 
 /* Every colour is declared once, as light-dark(light, dark), and the browser
@@ -1050,6 +1061,9 @@ h3:hover > .heading-anchor { opacity: 1; }
 .prose strong { font-weight: 600; }
 
 .prose ul, .prose ol { padding-left: 1.3em; }
+/* A lead-in line ("Summary of the proof:") sits close to the list it introduces,
+   not a full paragraph gap away. */
+.prose p + ul, .prose p + ol { margin-top: 0.55em; }
 .prose li + li { margin-top: 0.4em; }
 .prose li > ul, .prose li > ol { margin-top: 0.4em; }
 .prose li::marker { color: var(--rule-2); }
@@ -1248,14 +1262,42 @@ h3:hover > .heading-anchor { opacity: 1; }
   white-space: nowrap;
 }
 
-/* Build-time MathML. Display maths scrolls rather than widening the page. */
-.prose math { font-size: 1.02em; }
+/* Build-time MathML. Display maths scrolls rather than widening the page.
+   Prefer a serif math font that sits at the weight of the body serif; the
+   `math` generic keyword is the fallback so stretchy glyphs still render. */
+.prose math {
+  font-family: "Latin Modern Math", "STIX Two Math", math;
+  font-size: 1.1em;
+}
 .prose math[display="block"] {
   display: block;
   overflow-x: auto;
   overflow-y: hidden;
   padding-block: 0.4rem;
 }
+
+/* QED tombstone: a hollow square floated to the right of a proof's last line. */
+.prose .qed {
+  float: right;
+  width: 0.62em;
+  height: 0.62em;
+  margin-top: 0.3em;
+  border: 1px solid currentColor;
+}
+
+/* `{.part}` marks the first paragraph of a top-level part of a proof: a lemma
+   statement, prose bridging between lemmas, the closing line. It gets generous
+   space above so the parts read as separate units, while a proof's own innards
+   (Proof., the cases) stay on the normal tight rhythm. A part sitting directly
+   under a heading keeps the usual heading-follow gap instead. */
+.prose .part { margin-top: 2.75rem; }
+.prose h3 + .part { margin-top: 0.8rem; }
+
+/* Keep a lemma and its proof as one block. The `*Proof.*` marker is the only
+   lone-italic line in a proof, so it hugs the statement above it, and its
+   argument hugs it in turn. No extra markup: just write `*Proof.*` on its own. */
+.prose p:has(> em:only-child) { margin-top: 0.55em; }
+.prose p:has(> em:only-child) + * { margin-top: 0.5em; }
 
 /* --- 404 ----------------------------------------------------------------- */
 

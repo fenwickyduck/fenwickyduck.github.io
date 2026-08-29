@@ -68,7 +68,7 @@ buildFuture = false
     pageRef = "/writing"
     weight = 10
   [[menu.main]]
-    name = "Projects"
+    name = "Tools"
     pageRef = "/projects"
     weight = 20
   [[menu.main]]
@@ -80,6 +80,11 @@ buildFuture = false
   [markup.goldmark.renderer]
     # Allow raw HTML in posts when you need it.
     unsafe = true
+  [markup.goldmark.parser]
+    # Let a `{.class}` line attach a class to the block above it, so prose can
+    # tag a paragraph (e.g. a lemma statement) without wrapping it in raw HTML.
+    [markup.goldmark.parser.attribute]
+      block = true
   [markup.goldmark.extensions]
     [markup.goldmark.extensions.typographer]
       disable = false
