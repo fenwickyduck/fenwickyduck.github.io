@@ -57,7 +57,7 @@ Summary of the proof:
 - Extend to all square matrices using a continuity argument
 - Generalise to all rectangular matrices
 
-Although there is a much more direct and shorter proof using Schur decomposition, going about the proof in this way has really been enlightening. 
+Although there is a much more direct and shorter proof using Schur complement, going about the proof in this way has really been enlightening. 
 
 Specifically, given that the equality statement to be proven is composed of continuous functions, it is possible to extend something that holds for invertible matrices to all square matrices.
 
