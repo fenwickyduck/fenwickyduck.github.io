@@ -1,0 +1,7 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+{{ partial "post-list.html" .Pages }}
+{{- with .OutputFormats.Get "rss" }}
+<p><a href="{{ .RelPermalink }}">RSS</a></p>
+{{- end }}
+{{ end }}

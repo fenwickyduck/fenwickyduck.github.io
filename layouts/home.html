@@ -1,0 +1,18 @@
+{{ define "main" }}
+<h1>
+  {{- site.Title }}
+  {{- with site.Params.nameKo }} <span lang="ko">{{ . }}{{ with site.Params.nameHanja }} {{ . }}{{ end }}</span>{{ end -}}
+</h1>
+
+{{ .Content }}
+
+{{- $links := slice }}
+{{- if site.Params.emailUser }}{{ $links = $links | append (partial "email.html" . | string | strings.TrimSpace) }}{{ end }}
+{{- with site.Params.github }}{{ $links = $links | append (printf `<a href="%s" rel="me">GitHub</a>` .) }}{{ end }}
+{{- with site.Params.linkedin }}{{ $links = $links | append (printf `<a href="%s" rel="me">LinkedIn</a>` .) }}{{ end }}
+<p>{{ delimit $links " &middot; " | safeHTML }}</p>
+
+<h2>Writing</h2>
+{{ partial "post-list.html" (first 5 (where site.RegularPages "Section" "writing")) }}
+<p><a href="{{ "/writing/" | relURL }}">All posts</a></p>
+{{ end }}

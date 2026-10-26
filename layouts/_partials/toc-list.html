@@ -1,0 +1,11 @@
+{{- $depth := .depth }}
+{{- with where .headings "Level" "<=" $depth }}
+<ul>
+  {{- range . }}
+  <li>
+    <a href="#{{ .ID }}">{{ .Title | safeHTML }}</a>
+    {{- with .Headings }}{{ partial "toc-list.html" (dict "headings" . "depth" $depth) }}{{ end }}
+  </li>
+  {{- end }}
+</ul>
+{{- end }}

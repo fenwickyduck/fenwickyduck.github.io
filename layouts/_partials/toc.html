@@ -1,0 +1,14 @@
+{{- $depth := int (default 3 site.Params.tocDepth) -}}
+
+{{- /* Skip the untitled root fragment Hugo adds when a page has no h1. */ -}}
+{{- $tree := .Fragments.Headings -}}
+{{- if and $tree (eq (len $tree) 1) (not (index $tree 0).ID) -}}
+  {{- $tree = (index $tree 0).Headings -}}
+{{- end -}}
+
+{{- if and .Params.toc (ge (len .Fragments.Identifiers) 3) -}}
+<nav aria-label="Table of contents">
+  <p><b>Contents</b></p>
+  {{- partial "toc-list.html" (dict "headings" $tree "depth" $depth) }}
+</nav>
+{{- end -}}

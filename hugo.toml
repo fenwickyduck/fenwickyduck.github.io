@@ -1,0 +1,58 @@
+baseURL = "https://fenwickyduck.github.io/"
+locale = "en-GB"
+title = "Seyoon Park"
+copyright = "Seyoon Park"
+
+# Date-only front matter is read in this zone, not UTC.
+timeZone = "Asia/Seoul"
+
+enableRobotsTXT = true
+enableEmoji = true
+disableKinds = ["taxonomy", "term"]
+
+[permalinks]
+  writing = "/writing/:contentbasename/"
+
+[params]
+  author = "Seyoon Park"
+  nameKo = "박세윤"
+  nameHanja = "朴世阭"
+  description = "Seyoon Park — computer science at Oxford, writing about cryptography, quantum computation and contest problems."
+
+  # Rendered as "user [at] domain [dot] tld".
+  emailUser = "fenwickyduck"
+  emailDomain = "gmail"
+  emailTLD = "com"
+  github = "https://github.com/fenwickyduck"
+  linkedin = "https://www.linkedin.com/in/seyoon-park-andrew/"
+
+  tocDepth = 3
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.goldmark.parser]
+    [markup.goldmark.parser.attribute]
+      block = true
+  [markup.goldmark.extensions]
+    [markup.goldmark.extensions.typographer]
+      disable = false
+    [markup.goldmark.extensions.passthrough]
+      enable = true
+      [markup.goldmark.extensions.passthrough.delimiters]
+        block = [['\[', '\]'], ['$$', '$$']]
+        inline = [['\(', '\)'], ['$', '$']]
+  [markup.highlight]
+    codeFences = false
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]
+
+[services]
+  [services.rss]
+    limit = 30
+
+[minify]
+  disableXML = true
+  minifyOutput = true

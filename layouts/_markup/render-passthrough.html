@@ -1,0 +1,18 @@
+{{- /* LaTeX to MathML at build time. Chrome and Safari ignore mathvariant,
+       so styled letters (\mathbb{Z}) are swapped for their Unicode forms. */ -}}
+{{- $math := "" -}}
+{{- if eq .Type "block" -}}
+  {{- $math = transform.ToMath .Inner (dict "displayMode" true) -}}
+{{- else -}}
+  {{- $math = transform.ToMath .Inner -}}
+{{- end -}}
+{{- $math = string $math -}}
+{{- range findRESubmatch `<(mi|mn)( [^>]*)? mathvariant="([a-z-]+)"([^>]*)>([^<]+)</(?:mi|mn)>` $math -}}
+  {{- $table := index hugo.Data.mathvariants (index . 3) -}}
+  {{- if $table -}}
+    {{- $text := "" -}}
+    {{- range split (index . 5) "" -}}{{- $text = printf "%s%s" $text (or (index $table .) .) -}}{{- end -}}
+    {{- $math = replace $math (index . 0) (printf "<%s%s%s>%s</%s>" (index . 1) (or (index . 2) "") (index . 4) $text (index . 1)) -}}
+  {{- end -}}
+{{- end -}}
+{{- $math | safeHTML -}}
